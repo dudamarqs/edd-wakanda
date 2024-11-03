@@ -5,53 +5,53 @@
 
 Estrada *getEstrada(const char *NomeArquivo) {
     FILE *file = fopen(NomeArquivo, "r");
-    if (!file) return NULL; // retorna NULL se o arquivo não for aberto.
+    if (!file) return NULL;
 
-    Estrada *estrada = (Estrada *) malloc(sizeof(Estrada));
-    if (!estrada) return NULL;
-
-    fscanf(file, "%d", &estrada->T);
-    if (estrada->T < 3 || estrada->T > 1000000) {
+    Estrada *estrada = (Estrada *)malloc(sizeof(Estrada));
+    if (!estrada) {
         fclose(file);
-        free(estrada);
         return NULL;
-    }    
+    }
 
-    fscanf(file, "%d", &estrada->N);
-    if (estrada->N < 2 || estrada->N > 1000000) {
+    if (fscanf(file, "%d", &estrada->T) != 1 || estrada->T < 3 || estrada->T > 1000000) {
         fclose(file);
         free(estrada);
         return NULL;
     }
 
-    estrada->C = (Cidade *) malloc(estrada->N * sizeof(Cidade));
+    if (fscanf(file, "%d", &estrada->N) != 1 || estrada->N < 2 || estrada->N > 10000) {
+        fclose(file);
+        free(estrada);
+        return NULL;
+    }
+
+    estrada->C = (Cidade *)malloc(estrada->N * sizeof(Cidade));
     if (!estrada->C) {
         fclose(file);
         free(estrada);
         return NULL;
     }
 
-    // Lê a posição e o nome de cada cidade
     for (int i = 0; i < estrada->N; i++) {
-        int posicao;
-        char nome[200];
-
-        fscanf(file, "%s %d", nome, &posicao);
-
-        if (posicao <= 0 || posicao >= estrada->T) {
+        if (fscanf(file, "%d %255[^\n]", &estrada->C[i].Posicao, estrada->C[i].Nome) != 2) {
             fclose(file);
-            free(estrada->C); // libera memória alocada para cidades.
-            free(estrada); // libera memória alocada para estrada.
+            free(estrada->C);
+            free(estrada);
             return NULL;
         }
 
-        estrada->C[i].Posicao = posicao;
-        strcpy(estrada->C[i].Nome, nome); // copia o nome para a estrutura Cidade.
+        if (estrada->C[i].Posicao <= 0 || estrada->C[i].Posicao >= estrada->T) {
+            fclose(file);
+            free(estrada->C);
+            free(estrada);
+            return NULL;
+        }
     }
 
     fclose(file);
     return estrada;
 }
+
 
 double calcularMenorVizinhanca(const char *NomeArquivo) {
     Estrada *estrada = getEstrada(NomeArquivo);
