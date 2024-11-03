@@ -8,11 +8,18 @@ int main () {
     int Soma = 0; 
     int NumTeste = 0; 
 
-    FILE *Resposta = fopen("Resultado.txt", "w"); 
+    FILE *Resposta = fopen("Resultado.txt", "w");
 
-    Estrada *T1 = getEstrada("Teste01.txt"); 
+    Estrada *T1 = getEstrada("Teste01.txt");
+    if (!T1) {
+        fprintf(Resposta, "Erro: Estrada não inicializada (arquivo de entrada inválido ou problema de memória).\n");
+        fclose(Resposta);
+        return 1;
+    }
+
     double D1 = calcularMenorVizinhanca("Teste01.txt"); 
     char *C1 = cidadeMenorVizinhanca("Teste01.txt"); 
+
 
     if (T1->T == 10) Soma++; 
     NumTeste++; 
